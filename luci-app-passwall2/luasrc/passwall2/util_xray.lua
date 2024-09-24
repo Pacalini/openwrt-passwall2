@@ -1235,7 +1235,10 @@ function gen_config(var)
 					address = direct_dns_udp_server,
 					port = tonumber(direct_dns_udp_port) or 53,
 					network = "udp",
-					nonIPQuery = "skip"
+					nonIPQuery = "skip",
+					blockTypes = {
+						65
+					}
 				},
 				proxySettings = {
 					tag = "direct"
