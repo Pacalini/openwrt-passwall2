@@ -127,6 +127,12 @@ msgstr "直连 DNS DoH"
 msgid "Direct DNS EDNS Client Subnet"
 msgstr "直连 DNS EDNS Client Subnet"
 
+msgid "DNS Shunt"
+msgstr "DNS 分流"
+
+msgid "Xray: Use routing rules to shunt DNS requests. Otherwise tunnel ALL requests through the default node to remote."
+msgstr "Xray: 使用路由规则分流 DNS 请求。否则将所有请求通过默认节点发往远端。"
+
 msgid "Remote DNS Protocol"
 msgstr "远程 DNS 协议"
 

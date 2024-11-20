@@ -208,6 +208,10 @@ o:value("default", translate("Use global config") .. "(" .. UDP_REDIR_PORTS .. "
 o:value("1:65535", translate("All"))
 o.validate = port_validate
 
+o = s:taboption("DNS", Flag, "dns_shunt", translate("DNS Shunt"), translate("Xray: Use routing rules to shunt DNS requests. Otherwise tunnel ALL requests through the default node to remote."))
+o.default = "1"
+o.rmempty = false
+
 o = s:option(ListValue, "direct_dns_query_strategy", translate("Direct Query Strategy"))
 o.default = "UseIP"
 o:value("UseIP")
@@ -302,6 +306,9 @@ end
 
 for k, v in pairs(nodes_table) do
 	if v.type == "Xray" then
+		s.fields["direct_dns_query_strategy"]:depends({ node = v.id, dns_shunt = "1" })
+		s.fields["remote_dns_detour"]:depends({ node = v.id, dns_shunt = "1" })
+		s.fields["remote_fakedns"]:depends({ node = v.id, dns_shunt = "1" })
 		s.fields["remote_dns_client_ip"]:depends({ node = v.id, remote_dns_protocol = "tcp" })
 		s.fields["remote_dns_client_ip"]:depends({ node = v.id, remote_dns_protocol = "doh" })
 		s.fields["dns_hosts"]:depends({ node = v.id })

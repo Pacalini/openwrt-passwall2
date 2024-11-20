@@ -570,6 +570,7 @@ function gen_config(var)
 	local local_http_username = var["-local_http_username"]
 	local local_http_password = var["-local_http_password"]
 	local dns_listen_port = var["-dns_listen_port"]
+	local dns_shunt= var["-dns_shunt"]
 	local direct_dns_udp_server = var["-direct_dns_udp_server"]
 	local direct_dns_udp_port = var["-direct_dns_udp_port"]
 	local direct_dns_query_strategy = var["-direct_dns_query_strategy"]
@@ -1237,25 +1238,25 @@ function gen_config(var)
 	
 		local _direct_dns = nil
 		if direct_dns_udp_server then
-			local domain = {}
-			local nodes_domain_text = sys.exec('uci show passwall2 | grep ".address=" | cut -d "\'" -f 2 | grep "[a-zA-Z]$" | sort -u')
-			string.gsub(nodes_domain_text, '[^' .. "\r\n" .. ']+', function(w)
-				table.insert(domain, "full:" .. w)
-			end)
-			if #domain > 0 then
-				table.insert(dns_domain_rules, 1, {
-					outboundTag = "direct",
-					domain = domain
-				})
-			end
-
 			_direct_dns = {
 				_flag = "direct",
 				address = direct_dns_udp_server,
 				port = tonumber(direct_dns_udp_port) or 53,
 				queryStrategy = (direct_dns_query_strategy and direct_dns_query_strategy ~= "") and direct_dns_query_strategy or "UseIP",
 			}
+			if dns_shunt == "0" then
+				table.insert(routing.rules, 1, {
+					inboundTag = "dns-in1",
+					ip = {
+						remote_dns_udp_server
+					},
+					port = tonumber(remote_dns_udp_port) or 53,
+					network = "udp",
+					outboundTag = COMMON.default_outbound_tag
+				})
+			end
 			table.insert(routing.rules, 1, {
+				inboundTag = "dns-in1",
 				ip = {
 					direct_dns_udp_server
 				},
@@ -1296,11 +1297,18 @@ function gen_config(var)
 				settings = {
 					address = remote_dns_udp_server,
 					port = tonumber(remote_dns_udp_port) or 53,
-					network = _remote_dns_proto or "tcp",
-					nonIPQuery = "drop"
+					network = _remote_dns_proto or "udp",
+					nonIPQuery = "skip"
+				},
+				proxySettings = {
+					tag = COMMON.default_outbound_tag
 				}
 			}
 			local type_dns = direct_type_dns
+			if dns_shunt == "0" then
+				type_dns = remote_type_dns
+			end
+
 			table.insert(outbounds, {
 				tag = "dns-out",
 				protocol = "dns",
@@ -1341,8 +1349,21 @@ function gen_config(var)
 				table.insert(dns.servers, 1, dns_servers)
 			end
 
+			local domain = {}
+			local nodes_domain_text = sys.exec('uci show passwall2 | grep ".address=" | cut -d "\'" -f 2 | grep "[a-zA-Z]$" | sort -u')
+			string.gsub(nodes_domain_text, '[^' .. "\r\n" .. ']+', function(w)
+				table.insert(domain, "full:" .. w)
+			end)
+			if #domain > 0 then
+				local node_domain_dns_server = api.clone(_direct_dns)
+				node_domain_dns_server.domains = domain
+				if node_domain_dns_server then
+					table.insert(dns.servers, node_domain_dns_server)
+				end
+			end
+
 			--按分流顺序DNS
-			if dns_domain_rules and #dns_domain_rules > 0 then
+			if dns_domain_rules and #dns_domain_rules > 0 and dns_shunt == "1" then
 				for index, value in ipairs(dns_domain_rules) do
 					if value.domain and (value.outboundTag or value.balancerTag) then
 						local dns_server = nil
