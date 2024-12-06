@@ -1204,7 +1204,7 @@ ISP_DNS6=$(cat $RESOLVFILE 2>/dev/null | grep -E "([A-Fa-f0-9]{1,4}::?){1,7}[A-F
 DEFAULT_DNSMASQ_CFGID=$(uci show dhcp.@dnsmasq[0] |  awk -F '.' '{print $2}' | awk -F '=' '{print $1}'| head -1)
 DEFAULT_DNS=$(uci show dhcp.@dnsmasq[0] | grep "\.server=" | awk -F '=' '{print $2}' | sed "s/'//g" | tr ' ' '\n' | grep -v "\/" | head -2 | sed ':label;N;s/\n/,/;b label')
 [ -z "${DEFAULT_DNS}" ] && DEFAULT_DNS=$(echo -n $ISP_DNS | tr ' ' '\n' | head -2 | tr '\n' ',')
-AUTO_DNS=${DEFAULT_DNS:-119.29.29.29}
+AUTO_DNS=${DEFAULT_DNS:-127.0.0.1}
 
 PROXY_IPV6=$(config_t_get global_forwarding ipv6_tproxy 0)
 
