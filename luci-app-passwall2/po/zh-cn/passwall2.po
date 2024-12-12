@@ -133,6 +133,12 @@ msgstr "DNS 分流"
 msgid "Xray: Use routing rules to shunt DNS requests. Otherwise tunnel ALL requests through the default node to remote."
 msgstr "Xray: 使用路由规则分流 DNS 请求。否则将所有请求通过默认节点发往远端。"
 
+msgid "DNS Hijack"
+msgstr "DNS 劫持"
+
+msgid "Xray: Hijack the DNS traffic destined for these addresses into core DNS module."
+msgstr "Xray: 把以这些地址为目标的 DNS 流量劫持到核心的 DNS 模块中。"
+
 msgid "Remote DNS Protocol"
 msgstr "远程 DNS 协议"
 

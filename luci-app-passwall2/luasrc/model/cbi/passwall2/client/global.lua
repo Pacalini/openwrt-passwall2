@@ -248,6 +248,9 @@ o = s:taboption("DNS", Flag, "dns_shunt", translate("DNS Shunt"), translate("Xra
 o.default = "1"
 o.rmempty = false
 
+o = s:taboption("DNS", DynamicList, "dns_hijack_list", translate("DNS Hijack"), translate("Xray: Hijack the DNS traffic destined for these addresses into core DNS module."))
+o.datatype = "ipaddr"
+
 o = s:taboption("DNS", ListValue, "direct_dns_query_strategy", translate("Direct Query Strategy"))
 o.default = "UseIP"
 o:value("UseIP")

@@ -1309,6 +1309,16 @@ function gen_config(var)
 				type_dns = remote_type_dns
 			end
 
+			local dns_hijack_list = uci:get(appname, "@global[0]", "dns_hijack_list") or {}
+			if #dns_hijack_list > 0 then
+				table.insert(routing.rules, 1, {
+					ip = dns_hijack_list,
+					network = "udp",
+					port = 53,
+					outboundTag = "dns-out"
+				})
+			end
+
 			table.insert(outbounds, {
 				tag = "dns-out",
 				protocol = "dns",
