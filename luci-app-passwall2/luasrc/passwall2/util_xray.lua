@@ -1313,7 +1313,7 @@ function gen_config(var)
 			if #dns_hijack_list > 0 then
 				table.insert(routing.rules, 1, {
 					ip = dns_hijack_list,
-					network = "udp",
+					network = "tcp,udp",
 					port = 53,
 					outboundTag = "dns-out"
 				})
